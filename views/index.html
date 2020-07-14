@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Message Board</title>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">  </head>
+  <script>
+    fetch("/posts").then(function(response) {
+      response.json().then(function(data) {
+        let parsed = data.results
+          .reverse()
+          .map(
+            x =>
+              `<div class="postBody">
+<div class="header">
+<div class="postTitle">${x.title}</div>
+              
+              </div>
+<div class="signature">${x.name}</div>
+<div class="timestamp">${new Date(x.date).toLocaleString("default", {
+                month: "long"
+              })} ${new Date(x.date).getDate()}, ${new Date(x.date).getYear() +
+                1900} at ${new Date(x.date).getHours()}:${
+                new Date(x.date).getMinutes() < 10
+                  ? "0" + new Date(x.date).getMinutes()
+                  : new Date(x.date).getMinutes()
+              }</div>
+<div class="postMessage">${x.message}</div>
+  </div>
+
+              <div class="comments">
+<div class="hr"></div>
+<div class="commentNum">
+${x.comments.length} comment${
+                x.comments.length === 1 ? "" : "s"
+              }
+  </div>
+        ${
+          x.comments.length > 0
+            ? x.comments
+                .map(y => {
+                  return `
+<div class="commentBox">
+    <div class="commentHeader">
+<div class="commentBody">${y.message}</div>
+<div class="commentPoster">${y.name}, ${new Date(y.date).toLocaleString(
+          "default",
+          { month: "long" }
+        )} ${new Date(y.date).getDate()}, ${new Date(y.date).getYear() +
+                    1900} at ${new Date(y.date).getHours()}:${
+                    new Date(y.date).getMinutes() < 10
+                      ? "0" + new Date(y.date).getMinutes()
+                      : new Date(y.date).getMinutes()
+                  }</div>
+        
+    </div>
+    
+</div>
+
+`;
+                })
+                .join("")
+            : ""
+        }
+
+<form action="/api/newcomment" method="post">
+<input id="name" type="text" name="name" placeholder="Name" required />
+<input id="comment" name="comment" placeholder="Your message . . . " required />
+<input id="postId" name="postId" value="${x._id}" hidden />
+<input class="commentButton" type="submit" value="✔️" />
+  </form>
+
+
+    
+    </div>`
+          )
+          .join("");
+        document.getElementById("posts").innerHTML = parsed;
+        //console.log(data.results);
+      });
+    });
+  </script>
+
+  <body>
+<!--     <div class="searchBox">
+      <form action="/api/search" method="post">
+        <input class="search" id="search" name="search" type="text" required />
+        <input class="searchButton" type="submit" value="SUBMIT" />
+      </form>
+    </div>
+ -->
+    <div id="posts">
+      <div class="sbl-circ-path"></div>
+      <center><span class="load-text">omg i'm loading</span></center>
+    </div>
+
+    <div class="form">
+      <form action="/api/newpost" method="post">
+        <h3>New Post</h3>
+        <input
+          class="username"
+          id="username"
+          type="text"
+          name="name"
+          placeholder="Name"
+          required
+        />
+        <input
+          class="title"
+          id="postTitle"
+          type="text"
+          name="title"
+          placeholder="Title"
+          required
+        />
+        <textarea
+          class="message"
+          id="postMessage"
+          type="text"
+          name="message"
+          placeholder="Your message . . . "
+          required
+        ></textarea>
+        <input class="postButton" type="submit" value="SUBMIT" />
+      </form>
+    </div>
+  </body>
+</html>
